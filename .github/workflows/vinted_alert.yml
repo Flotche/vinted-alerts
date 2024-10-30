@@ -1,0 +1,25 @@
+name: Vinted Alert Checker
+
+on:
+  schedule:
+    - cron: "0 * * * *"  # Cela exécutera le script toutes les heures
+  workflow_dispatch:
+
+jobs:
+  check-vinted:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install beautifulsoup4 requests
+
+      - name: Run Vinted Checker
+        run: python vinted_checker.py
