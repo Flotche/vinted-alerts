@@ -18,19 +18,34 @@ def send_email():
     msg['Subject'] = subject
     msg.attach(MIMEText(body, 'plain'))
 
-    server = smtplib.SMTP('smtp.gmail.com', 587)
-    server.starttls()
-    server.login(EMAIL, PASSWORD)
-    server.sendmail(EMAIL, EMAIL, msg.as_string())
-    server.quit()
+    try:
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(EMAIL, PASSWORD)
+        server.sendmail(EMAIL, EMAIL, msg.as_string())
+        server.quit()
+        print("Email envoyé avec succès.")
+    except Exception as e:
+        print(f"Erreur lors de l'envoi de l'email : {e}")
 
 def check_vinted():
-    response = requests.get(URL)
-    soup = BeautifulSoup(response.content, "html.parser")
-    items = soup.find_all("div", class_="FeedItem__content")
+    try:
+        response = requests.get(URL)
+        print(f"Statut de la réponse HTTP : {response.status_code}")
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.content, "html.parser")
+            items = soup.find_all("div", class_="FeedItem__content")
+            print(f"Nombre d'articles trouvés : {len(items)}")
 
-    if items:
-        send_email()
+            if len(items) > 0:
+                print("Nouveaux articles trouvés.")
+                send_email()
+            else:
+                print("Aucun nouvel article trouvé.")
+        else:
+            print("Erreur lors de la requête HTTP.")
+    except Exception as e:
+        print(f"Erreur lors de la récupération des données : {e}")
 
 if __name__ == "__main__":
     check_vinted()
